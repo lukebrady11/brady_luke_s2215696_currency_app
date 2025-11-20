@@ -18,16 +18,18 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
-import android.view.View.OnClickListener;
 import android.graphics.Color;
+
+import android.view.View.OnClickListener;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -59,11 +61,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private String result = "";
     private String urlSource = "https://www.fx-exchange.com/gbp/rss.xml";
 
-    // hold parsed data
+    // Data collections
     private final List<CurrencyRate> allRates = new ArrayList<>();
     private final List<CurrencyRate> shownRates = new ArrayList<>();
     private final List<CurrencyRate> rates = new ArrayList<>();
 
+    // Threading
     private ExecutorService exec = Executors.newSingleThreadExecutor();
     private ScheduledExecutorService scheduler;
 
@@ -74,12 +77,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        // Link views from xml
         rawDataDisplay = findViewById(R.id.rawDataDisplay);
         keyRatesLayout = findViewById(R.id.keyRatesLayout);
         startButton = findViewById(R.id.startButton);
         startButton.setOnClickListener(this);
 
-        // RecyclerView (guarded)
+        // RecyclerView setup
         rvRates = findViewById(R.id.rvRates);
         adapter = new RatesAdapter();
         if (rvRates != null) {
@@ -94,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             });
         }
 
-        // SearchView (guarded)
+        // SearchView setup
         searchView = findViewById(R.id.searchView);
         if (searchView != null) {
             searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
@@ -106,11 +111,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     @Override
     public void onClick(View aview) {
+        // Manual refresh button
         startProgress();
     }
     @Override
     protected void onStart() {
         super.onStart();
+
+        // Automatic refresh: calls startProgress() once at startup and then every 15 minutes
         if (scheduler == null || scheduler.isShutdown()) {
             scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleWithFixedDelay(
@@ -125,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     @Override
     protected void onStop() {
         super.onStop();
+        // Stop when Activity is no longer visible
         if (scheduler != null) {
             scheduler.shutdownNow();
         }
@@ -133,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Stop when Activity is destroyed
         if (scheduler != null) {
             scheduler.shutdownNow();
         }
@@ -140,13 +150,15 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             exec.shutdownNow();
         }
     }
-
+    // Starts a background task to download and parse the data
     private void startProgress() {
         if (exec == null || exec.isShutdown()) {
             exec = Executors.newSingleThreadExecutor();
         }
         exec.execute(new Task(urlSource));
     }
+
+    // Filter list (allRates) into shownRates based on query, Matches code or name
     private void applyFilter(String q) {
         String query = q == null ? "" : q.trim().toUpperCase();
         shownRates.clear();
@@ -164,6 +176,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     };
 
+
+    // Creates key rates section, using white text and main button colour
     private void updateKeyRatesBoxes() {
         if (keyRatesLayout == null) return;
         keyRatesLayout.removeAllViews();
@@ -200,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             v.setBackgroundColor(primary);
 
             final CurrencyRate item = match;
-
+            // key box also opens converter
             v.setOnClickListener(view -> {
                 android.content.Intent i =
                         new android.content.Intent(MainActivity.this, ConverterActivity.class);
@@ -214,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         }
     }
 
-
+    // downloads RSS XML and parses it with XMLPullParser, builds CurrencyRate objects
     private class Task implements Runnable {
         private String url;
         public Task(String aurl) { url = aurl; }
@@ -251,20 +265,19 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 return;
             }
 
-            // strip leading garbage
+            // Cleaning
             int i = result.indexOf("<?");
             if (i >= 0) result = result.substring(i);
-            // strip trailing garbage
             i = result.indexOf("</rss>");
             if (i >= 0 && i + 6 <= result.length()) result = result.substring(0, i + 6);
 
             try {
+                // Set up XML pull parser
                 XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
                 factory.setNamespaceAware(true);
                 XmlPullParser xpp = factory.newPullParser();
                 xpp.setInput(new StringReader(result));
 
-                // ===== YOUR PARSING HERE (now filled) =====
                 rates.clear();
 
                 List<String> lines = new ArrayList<>();
@@ -306,19 +319,24 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                 } else if ("description".equalsIgnoreCase(name)) {
                                     itemDescription = (text == null) ? "" : text.trim();
                                 } else if ("item".equalsIgnoreCase(name)) {
-                                    // Process one finished item
+                                    // Process one currency item
+
+                                    // Title format
                                     String right = itemTitle;
                                     int slash = itemTitle.indexOf('/');
                                     if (slash >= 0 && slash + 1 < itemTitle.length()) {
                                         right = itemTitle.substring(slash + 1);
                                     }
 
+                                    // Extract 3-letter code from ("XXX") at end
                                     String code = null;
                                     Matcher mCode = codePattern.matcher(right);
                                     if (mCode.find()) code = mCode.group(1);
 
+                                    // Remove ("XXX") from title
                                     String displayName = right.replaceAll("\\([A-Z]{3}\\)", "").trim();
 
+                                    // Extract rate from description
                                     double rate = 0.0;
                                     Matcher mRate = ratePattern.matcher(itemDescription);
                                     if (mRate.find()) {
@@ -327,6 +345,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                     }
 
                                     if (code != null && rate > 0) {
+                                        // Create CurrencyRate object
                                         CurrencyRate cr = new CurrencyRate();
                                         cr.code = code;
                                         cr.name = displayName;
@@ -355,6 +374,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 }
                 sb.append("Fetched: ").append(localFetchTime).append("\n\n");
 
+                // Build key rates
                 String[] main = {"USD", "EUR", "JPY"};
                 for (String m : main) {
                     for (CurrencyRate r : rates) {
@@ -367,6 +387,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 }
                 sb.append("\n");
 
+                // Show first 25 lines
                 int show = Math.min(25, lines.size());
                 for (int k = 0; k < show; k++) sb.append(lines.get(k)).append("\n");
                 if (lines.isEmpty()) sb.append("No currency items parsed. Check feed contents/format.");
@@ -396,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 });
             }
         }
-
+        // post an error message to UI thread
            private void postToUi(String msg) {
             if (rawDataDisplay == null) return;
             rawDataDisplay.post(() -> {

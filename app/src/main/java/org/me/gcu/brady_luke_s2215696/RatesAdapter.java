@@ -5,13 +5,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
+// Adapter for RecyclerView to display CurrencyRate objects
 public class RatesAdapter extends RecyclerView.Adapter<RatesAdapter.VH> {
 
+    // Interface for click events
     public interface OnItemClick {
         void onClick(CurrencyRate rate);
     }
@@ -20,6 +24,8 @@ public class RatesAdapter extends RecyclerView.Adapter<RatesAdapter.VH> {
     private final List<CurrencyRate> data = new ArrayList<>();
 
     public void setOnItemClick(OnItemClick c) { this.click = c; }
+
+    // Replace the current data set and refresh the list
     public void setData(List<CurrencyRate> newData) {
         data.clear();
         if (newData != null) data.addAll(newData);
@@ -28,6 +34,7 @@ public class RatesAdapter extends RecyclerView.Adapter<RatesAdapter.VH> {
 
     @NonNull @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_rate, parent, false);
         return new VH(v);
@@ -36,11 +43,13 @@ public class RatesAdapter extends RecyclerView.Adapter<RatesAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
         CurrencyRate r = data.get(pos);
+
+        // Populate text fields
         h.tvCode.setText(r.code);
         h.tvRate.setText("1 GBP = " + r.rateToGBP + " " + r.code);
         h.tvName.setText(r.name);
 
-        // ---------- FLAGS ----------
+        // Populate flag image
         String countryCode = getCountryCodeFromCurrency(r.code);   // e.g. "us"
         if (h.ivFlag != null) {
             int resId = h.itemView.getResources().getIdentifier(
@@ -55,12 +64,12 @@ public class RatesAdapter extends RecyclerView.Adapter<RatesAdapter.VH> {
             }
         }
 
-        // simple colour buckets
+        // Simple colour buckets
         int bg;
-        if (r.rateToGBP < 1.0) bg = 0xFF2E7D32;          // green
-        else if (r.rateToGBP < 5.0) bg = 0xFF81C784;     // light green
-        else if (r.rateToGBP < 10.0) bg = 0xFFFFF59D;    // yellow
-        else bg = 0xFFE57373;                            // red
+        if (r.rateToGBP < 1.0) bg = 0xFF2E7D32;          // green - Strong
+        else if (r.rateToGBP < 5.0) bg = 0xFF81C784;     // light green - Moderate
+        else if (r.rateToGBP < 10.0) bg = 0xFFFFF59D;    // yellow - Mid-range
+        else bg = 0xFFE57373;                            // red - Weaker
         h.itemView.setBackgroundColor(bg);
         h.itemView.setOnClickListener(v -> {
             if (click != null) click.onClick(r);
@@ -80,7 +89,7 @@ public class RatesAdapter extends RecyclerView.Adapter<RatesAdapter.VH> {
             ivFlag = itemView.findViewById(R.id.ivFlag);
         }
     }
-    // ---------- Currency → Country mapping ----------
+    // Currency to flag mapping
     private String getCountryCodeFromCurrency(String code) {
         if (code == null) return "unknown";
 
