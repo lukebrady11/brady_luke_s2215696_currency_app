@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:background="@color/screenBackground">
+
+    <!-- LEFT PANE: title, button, feed info, 3 key boxes -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/salutation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Currency Exchange Rates and Convertor"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:padding="4dp"
+                android:background="#ffffff"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/startButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Press to get data"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="@color/primaryButton"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/acknowledgement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fx Currency Exchange data"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:textStyle="bold"
+                android:textAlignment="center" />
+
+            <!-- Only show top of the summary: feed + fetched -->
+            <TextView
+                android:id="@+id/rawDataDisplay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginTop="12dp"
+                android:background="#ffffff"
+                android:padding="8dp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- 3 key currencies go here (USD/EUR/JPY) -->
+            <LinearLayout
+                android:id="@+id/keyRatesLayout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- RIGHT PANE: search + list of currencies -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:queryHint="Search by code or name"
+            android:background="#ffffff"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRates"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
