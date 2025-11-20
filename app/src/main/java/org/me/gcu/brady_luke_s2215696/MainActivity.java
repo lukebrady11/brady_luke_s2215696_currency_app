@@ -6,9 +6,9 @@ package org.me.gcu.brady_luke_s2215696;
     raw data in a TextField
 */
 
-// Name                 _________________
-// Student ID           _________________
-// Programme of Study   _________________
+// Name                 Luke Brady
+// Student ID           S2215696
+// Programme of Study   Computing
 
 
 import android.os.Bundle;
@@ -28,7 +28,6 @@ import androidx.appcompat.widget.SearchView;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -114,8 +113,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         super.onStart();
         if (scheduler == null || scheduler.isShutdown()) {
             scheduler = Executors.newSingleThreadScheduledExecutor();
-            // first run immediately, then every 15 minutes
-            scheduler.scheduleAtFixedRate(
+            scheduler.scheduleWithFixedDelay(
                     this::startProgress,
                     0,
                     15,
