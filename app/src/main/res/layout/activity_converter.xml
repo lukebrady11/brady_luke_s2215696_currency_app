@@ -32,7 +32,7 @@
         android:orientation="horizontal"
         android:layout_marginTop="12dp">
 
-        <!-- ✅ First radio button (GBP → CODE) -->
+        <!-- First radio button (GBP → CODE) -->
         <RadioButton
             android:id="@+id/rbGbpTo"
             android:layout_width="wrap_content"
@@ -40,7 +40,7 @@
             android:checked="true"
             android:text="GBP → XXX" />
 
-        <!-- ✅ Second radio button (CODE → GBP) -->
+        <!-- Second radio button (CODE → GBP) -->
         <RadioButton
             android:id="@+id/rbToGbp"
             android:layout_width="wrap_content"

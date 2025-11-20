@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <!-- Key code section -->
     <TextView
         android:id="@+id/tvKeyCode"
         android:layout_width="wrap_content"
@@ -12,6 +13,7 @@
         android:textStyle="bold"
         android:textSize="18sp" />
 
+    <!-- Key rate section -->
     <TextView
         android:id="@+id/tvKeyRate"
         android:layout_width="wrap_content"
@@ -19,6 +21,7 @@
         android:textSize="16sp"
         android:layout_marginTop="2dp" />
 
+    <!-- Key name section -->
     <TextView
         android:id="@+id/tvKeyName"
         android:layout_width="wrap_content"

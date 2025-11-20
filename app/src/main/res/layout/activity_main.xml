@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/screenBackground">
-
-
+    <!-- Top Panel -->
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1.2">
 
+        <!-- Main Title -->
         <TextView
             android:id="@+id/salutation"
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:text="Currency Exchange Rates and Convertor"
             android:textAlignment="center"
             android:textStyle="bold"/>
-
+        <!-- Manual button -->
         <Button
             android:id="@+id/startButton"
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
             android:textAlignment="center"
             android:textStyle="bold"/>
 
-        <!-- summary text -->
+
         <TextView
             android:id="@+id/rawDataDisplay"
             android:layout_width="match_parent"
@@ -55,6 +55,7 @@
             android:ellipsize="end" />
     </LinearLayout>
 
+    <!-- 3 Key currency boxes -->
     <LinearLayout
         android:id="@+id/keyRatesLayout"
         android:orientation="vertical"
@@ -62,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp" />
 
-    <!-- LIST SECTION: give it weight 2 (more space) -->
+    <!-- Search box for filter -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
@@ -71,6 +72,7 @@
         android:layout_marginTop="12dp"
         android:background="#ffffff"/>
 
+    <!-- List of currencies -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRates"
         android:layout_width="match_parent"
